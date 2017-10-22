@@ -241,8 +241,12 @@ class MyClass: BaseClass {
     
     // MARK: - IBOutlets
     
-    @IBOutlet private weak let titleLabel: UILabel!
+    @IBOutlet private weak var titleLabel: UILabel!
     
+    // MARK: - NSLayoutConstraints
+    
+    @IBOutlet private weak var titleLabelTopConstraint: NSLayoutConstraint!
+
     // MARK: - Constants
     
     private let isUsingLasers = true
@@ -277,6 +281,7 @@ extension MyClass: Comparable { ... }
 extension MyClass: Equatable { ... }
 
 // MARK: - Private methods
+
 private extension MyClass { ... }
 ```
 
