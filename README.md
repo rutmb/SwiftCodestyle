@@ -236,54 +236,53 @@ enum Direction {
 Класс имеет следующую структуру:
 
 ```swift
-// MARK: Global operators taking the class as a params
-func == (lhs: MyClass, rhs: MyClass) -> Bool { ... }
 
-// MARK: Class
 class MyClass: BaseClass {
     
-    // MARK: Declarations
+    // MARK: - IBOutlets
     
-    // 1.1. Outlets
     @IBOutlet private weak let titleLabel: UILabel!
     
-    // [1.1]. Publish subjects and observables [only if Rx is used]
-    var citySelected: PublishSubject<City>? = nil
+    // MARK: - Constants
     
-    // 1.2. Public properties, calculated and lazy
-    var text: String { get { ... } set { ... } }
-    
-    // 1.3. Private properties
     private let isUsingLasers = true
     
-    // MARK: Lifecycle
+    // MARK: - Properties 
     
-    // 2.1. Initializers
+    var citySelected: PublishSubject<City>? = nil
+    var text: String { get { ... } set { ... } }
+    
+    // MARK: - Initialization and deinitialization
+    
     init?(city: anotherCity) { ... }
     
-    // 2.2. Lifecycle
+    // MARK: - BaseClass
+    
     override func awakeFromNib() { ... }
     override func viewDidLoad() { ... }
     
-    // MARK: Public
+    // MARK: - Internal methods
+
     func fill(city: City) { ... }
     func getPopulation() -> Int { ... }
-    
-    // MARK: Private
-    private func calculateOverpopulation() { ... }
+
 }
 
-// MARK: Extensions
-extension MyClass: Comparable { ... }
-extension MyClass: Equitable { ... }
+// MARK: - Comparable
 
-// MARK: Private extensions for private methods
-extension MyClass { ... }
+extension MyClass: Comparable { ... }
+
+// MARK: - Equatable
+
+extension MyClass: Equatable { ... }
+
+// MARK: - Private methods
+private extension MyClass { ... }
 ```
 
-* Старайтесь опираться на нее и разделять блоки кода с помощью `// MARK:` для лучшей читабельности.
+* Старайтесь опираться на нее и разделять блоки кода с помощью `// MARK: -` для лучшей читабельности.
 * Соблюдение протоколов класса должны быть выделены в `extension`-блоки, как в примере выше.
-* Все методы, используемые как вспомогательные, должны быть скрыты в приватном расширении класса, как показано выше.
+* Все методы, используемые как вспомогательные, должны быть скрыты в приватном расширении класса, как показано выше. 
 * Убираем ненужные пустые методы вроде `override func viewDidRecieveMemoryWarning() { super.didRecieveMemoryWarning() }`.
 
 ### Комментарии
