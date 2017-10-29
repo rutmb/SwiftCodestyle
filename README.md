@@ -9,7 +9,7 @@
     * [Разделение операторов](#Разделение-операторов)
     * [Объявление переменных](#Объявление-переменных)
 * [Именование переменных](#Именование-переменных)
-    * [Перечислимые типы](#Перечислимые-типы)
+    * [Перечисляемые типы](#Перечисляемые-типы)
     * [Протоколы](#Протоколы)
     * [Селекторы](#Селекторы)
     * [Генерики](#Генерики)
@@ -36,17 +36,17 @@
 
 Предполагается использование английского языка для именования переменных, методов, классов.
 
-Далее для каждого проекта отдельно команда решает, стоит ли использовать для комментариев, commit messages и документации русский или английский. Определяется язык проекта. При не очень хорошем английском хотя бы у **одного** члена команды, надо всеми использовать русский. Для иностранных проектов использование английского для документации обязательно.
+Далее для каждого проекта отдельно команда решает, стоит ли использовать для комментариев, commit messages и документации русский или английский. Определяется язык проекта. При плохом владении английским языком хотя бы у **одного** члена команды, необходимо всей команде использовать русский язык. Для иностранных проектов использование английского языка обязательно.
 Смотрим в репозиторий, спрашиваем у других, затем пишем commit message на нужном языке. Не нужно писать на ломаном английском в проекте, где все пишут комментарии на русском, а также оставлять непонятные русские комментарии в проекте с иностранным заказчиком.
-
-**Желательно:**
-```swift
-let loadingColor = UIColor.white()
-```
 
 **Нежелательно:**
 ```swift
 let zagruzkaColor = UIColor.white()
+```
+
+**Желательно:**
+```swift
+let loadingColor = UIColor.white()
 ```
 
 ## Общее
@@ -109,7 +109,7 @@ a = 10
 
 ## Именование переменных
 
-* Стараться не сокращать, давать понятные имена, отражающие роль переменной в контексте. 
+* Стараться не сокращать переменные, давать понятные имена, отражающие роль переменной в контексте. 
 * Не использовать венгерскую нотацию (например, `kCLLocationManagerFilterNone`), snake case (`like_so`), или macro case (`LIKE_THIS`).
 * Опускать ненужные слова:
 
@@ -199,7 +199,7 @@ let z = x.appending(y)
   let order = lastName.compare(royalFamilyName, options: [], range: nil, locale: nil)
 ```
 
-### Перечислимые типы
+### Перечисляемые типы
 
 Элементы перечислимого типа именовать в camelCase, начиная с маленькой буквы, если используется Swift 3 версии, и с большой для 2-й, соответственно:
 
@@ -236,54 +236,58 @@ enum Direction {
 Класс имеет следующую структуру:
 
 ```swift
-// MARK: Global operators taking the class as a params
-func == (lhs: MyClass, rhs: MyClass) -> Bool { ... }
 
-// MARK: Class
 class MyClass: BaseClass {
     
-    // MARK: Declarations
+    // MARK: - IBOutlets
     
-    // 1.1. Outlets
-    @IBOutlet private weak let titleLabel: UILabel!
+    @IBOutlet private weak var titleLabel: UILabel!
     
-    // [1.1]. Publish subjects and observables [only if Rx is used]
-    var citySelected: PublishSubject<City>? = nil
+    // MARK: - NSLayoutConstraints
     
-    // 1.2. Public properties, calculated and lazy
-    var text: String { get { ... } set { ... } }
+    @IBOutlet private weak var titleLabelTopConstraint: NSLayoutConstraint!
+
+    // MARK: - Constants
     
-    // 1.3. Private properties
     private let isUsingLasers = true
     
-    // MARK: Lifecycle
+    // MARK: - Properties 
     
-    // 2.1. Initializers
+    var citySelected: PublishSubject<City>? = nil
+    var text: String { get { ... } set { ... } }
+    
+    // MARK: - Initialization and deinitialization
+    
     init?(city: anotherCity) { ... }
     
-    // 2.2. Lifecycle
+    // MARK: - BaseClass
+    
     override func awakeFromNib() { ... }
     override func viewDidLoad() { ... }
     
-    // MARK: Public
+    // MARK: - Internal methods
+
     func fill(city: City) { ... }
     func getPopulation() -> Int { ... }
-    
-    // MARK: Private
-    private func calculateOverpopulation() { ... }
+
 }
 
-// MARK: Extensions
-extension MyClass: Comparable { ... }
-extension MyClass: Equitable { ... }
+// MARK: - Comparable
 
-// MARK: Private extensions for private methods
-extension MyClass { ... }
+extension MyClass: Comparable { ... }
+
+// MARK: - Equatable
+
+extension MyClass: Equatable { ... }
+
+// MARK: - Private methods
+
+private extension MyClass { ... }
 ```
 
-* Старайтесь опираться на нее и разделять блоки кода с помощью `// MARK:` для лучшей читабельности.
+* Старайтесь опираться на нее и разделять блоки кода с помощью `// MARK: -` для лучшей читабельности.
 * Соблюдение протоколов класса должны быть выделены в `extension`-блоки, как в примере выше.
-* Все методы, используемые как вспомогательные, должны быть скрыты в приватном расширении класса, как показано выше.
+* Все методы, используемые как вспомогательные, должны быть скрыты в приватном расширении класса, как показано выше. 
 * Убираем ненужные пустые методы вроде `override func viewDidRecieveMemoryWarning() { super.didRecieveMemoryWarning() }`.
 
 ### Комментарии
