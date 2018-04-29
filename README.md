@@ -242,7 +242,7 @@ class MyClass: BaseClass {
     // MARK: - Constants
     
     private enum Constants {
-        static let isUsingLasers: Bool = true
+    	static let isUsingLasers: Bool = true
 	static let animationTime: TimeInterval = 0.3
     }
     
