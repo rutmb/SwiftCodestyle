@@ -238,6 +238,18 @@ enum Direction {
 ```swift
 
 class MyClass: BaseClass {
+
+    // MARK: - Constants
+    
+    private enum Constants {
+    	static let isUsingLasers: Bool = true
+	static let animationTime: TimeInterval = 0.3
+    }
+    
+    // MARK: - Properties 
+    
+    var citySelected: PublishSubject<City>? = nil
+    var text: String { get { ... } set { ... } }
     
     // MARK: - IBOutlets
     
@@ -246,15 +258,10 @@ class MyClass: BaseClass {
     // MARK: - NSLayoutConstraints
     
     @IBOutlet private weak var titleLabelTopConstraint: NSLayoutConstraint!
-
-    // MARK: - Constants
     
-    private let isUsingLasers = true
+    // MARK: - IBActions
     
-    // MARK: - Properties 
-    
-    var citySelected: PublishSubject<City>? = nil
-    var text: String { get { ... } set { ... } }
+    @IBaction private func cancel(_ sender: UIButton) { ... }
     
     // MARK: - Initialization and deinitialization
     
@@ -400,8 +407,8 @@ var notSoObviouslyFloat: CGFloat = 13.012
 
 ```swift
 enum Colors {
-    static let CustomRed = UIColor(red: 250/255.0, green: 15/255.0, blue: 20/255.0, alpha: 1.0)
-    static let CustomBlue = UIColor(red: 10/255.0, green: 0, blue: 200/255.0, alpha: 1.0)
+    static let customRed = UIColor(red: 250 / 255.0, green: 15 / 255.0, blue: 20 / 255.0, alpha: 1.0)
+    static let customBlue = UIColor(red: 10 / 255.0, green: 0, blue: 200 / 255.0, alpha: 1.0)
 }
 ```
 
@@ -411,12 +418,21 @@ enum Colors {
 
 ```swift
 class MyView : UIView {
-    @IBOutlet var button : UIButton!
+
+    // MARK: - IBOutlets
+
+    @IBOutlet private var button : UIButton!
+
+    // MARK: - Properties
+
     var buttonOriginalWidth : CGFloat!
+
+    // MARK: - UIView
 
     override func awakeFromNib() {
         self.buttonOriginalWidth = self.button.frame.size.width
     }
+
 }
 ```
 
