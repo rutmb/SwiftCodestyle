@@ -13,6 +13,8 @@
     * [Протоколы](#Протоколы)
     * [Селекторы](#Селекторы)
     * [Генерики](#Генерики)
+    * [Tuples](#Tuples)
+    * [Typealiases](#Typealiases)
 * [Организация кода](#Организация-кода)
     * [Структура класса](#Структура-класса)
     * [Комментарии](#Комментарии)
@@ -124,7 +126,9 @@ print(myCart.weight)
 print(myCar.speed)
 ```
 
-* Именование переменных должно вести к тому, чтобы вызовы методов складывались в корректные английские фразы:
+* Называйте функции с параметрами так, чтобы было понятно, что такое первый параметр.
+Если это невозможно, укажите явную метку для первого параметра.
+Именование переменных должно вести к тому, чтобы вызовы методов складывались в корректные английские фразы:
 
 **Нежелательно:** 
 ```swift
@@ -133,6 +137,20 @@ array.remove(x) // что такое x? Объект или индекс?
 x.insert(y, position: z)
 x.subViews(color: y)
 x.nounCapitalize()
+
+class Person {
+  init(_ firstName: String, _ lastName: String) {
+  // No external parameter names when called: Person("Some", "Guy")
+}
+
+  func set(name: String) {
+  // It's not clear what the parameter is: set("Mr Bill")
+  }
+
+  func setSomething(firstName: String, lastName: String) {
+  // The method name has nothing to do with the parameters: setSomething("John", lastName: "Smith")
+  }
+}
 ```
 **Желательно:** 
 ```swift
@@ -142,6 +160,20 @@ array.remove(item)
 x.insert(y, at: z)          // x, insert y at z
 x.subViews(havingColor: y)  // x's subviews having color y
 x.capitalizingNouns()       // x, capitalizing nouns
+
+class Person {
+  init(firstName: String, lastName: String) {
+  // Called as Person(firstName: "...", lastName: "...")
+  }
+
+  func setName(name: String) {
+  // Called as setName("...")
+  }
+
+  func setName(first firstName: String, last lastName: String) {
+  // Called as setName(first: "...", last: "...")
+  }
+}
 ```
 
 * Именование параметров должно выделять единый уровень абстракции:
@@ -182,7 +214,7 @@ let result = array.sorted()
 let z = x.appending(y)
 ```
 
-* Использовать значения параметров по умолчанию:
+* Использовать где возможно значения параметров по умолчанию:
 
 ```swift
   extension String {
@@ -201,7 +233,7 @@ let z = x.appending(y)
 
 ### Перечисляемые типы
 
-Элементы перечислимого типа именовать в camelCase, начиная с маленькой буквы, если используется Swift 3 версии, и с большой для 2-й, соответственно:
+Элементы перечислимого типа именовать в camelCase, начиная с маленькой буквы, если используется Swift 3 и выше версия:
 
 ```swift
 // Swift 3
@@ -209,15 +241,43 @@ enum Direction {
     case up, down, left, right
 }
 
-// Swift 2
-enum Direction {
-    case Up, Down, Left, Right
-}
 ```
 
 ### Протоколы
 
 Имена протоколов должны быть выражены в виде имен существительных, если оно описывает **предназначение** (например, `Collection`), или добавляются суффиксы `-able`, `-ed`, `-ing`, если это описывает **поведение** (например, `Equatable`, `ProgressReporting`).
+
+Если ваш протокол должен иметь опциональные методы, он должен быть объявлен с атрибутом `@objc`.
+Объявите определения протокола рядом с классом, использующим делегат, а не с классом, реализующим методы делегата.
+Если несколько классов используют один и тот же протокол, объявите его в собственном файле.
+Используйте  `weak var` для переменных делегата для того чтобы избежать `retain cycle`.
+
+```
+//SomeTableCell.swift
+
+protocol SomeTableCellDelegate: class {
+  func someTableCell(cell: SomeTableCell, didTapSignUpButton button: UIButton)
+}
+
+class SomeTableCell: UITableViewCell {
+  weak var delegate: SomeTableCellDelegate?
+  // ...
+}
+//SomeTableViewController.swift
+
+class SomeTableViewController: UITableViewController {
+// ...
+}
+
+// MARK: - SomeTableCellDelegate
+
+extension SomeTableViewController: SomeTableCellDelegate {
+  func someTableCell(cell: SomeTableCell,   didTapSignUpButton button: UIButton) {
+  // Implementation of cellbuttonwasTapped method
+  }
+}
+
+```
 
 ### Селекторы
 
@@ -228,6 +288,21 @@ enum Direction {
 Указывать не традиционное `T` или `U` в качестве имени обобщенного параметра, а более определенные, вроде `Element` или `Item`. 
 
 Исключениями здесь могут быть, например, пользовательские операторы, являющиеся очень высокой абстракцией над данными.
+
+### Tuples
+
+Создавайте имена членов кортежей `Tuples` при создании:
+
+```
+let foo = (something: "cats", somethingElse: 909_099)
+let (something, somethingElse) = foo
+
+```
+
+### Typealiases
+
+Создайте `typealiases`, чтобы придать семантический смысл часто используемым типы данных и замыканиям.
+Typealias эквивалентно `typedef`  в C и должны использоваться для создания имен для типов.
 
 ## Организация кода
 
