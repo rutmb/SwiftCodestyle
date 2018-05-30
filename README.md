@@ -8,6 +8,7 @@
     * [Типы данных](#Типы-данных)
     * [Разделение операторов](#Разделение-операторов)
     * [Объявление переменных](#Объявление-переменных)
+    * [Модификаторы доступа](#Модификаторы доступа)
 * [Именование переменных](#Именование-переменных)
     * [Перечисляемые типы](#Перечисляемые-типы)
     * [Протоколы](#Протоколы)
@@ -33,6 +34,7 @@
     * [Guard](#guard)
     * [If let](#if-let)
 * [Правила хорошего тона](#Правила-хорошего-тона)
+    * [defer](#defer)
 
 ## Язык
 
@@ -109,10 +111,32 @@ a = 10
 ### Объявление переменных
 Использовать `let` при объявлении переменных по возможности всегда.
 
+### Модификаторы доступа
+* При необходимости сначала напишите ключевое слово модификатора доступа: `private` и `fileprivate`.
+Единственные слова, которые могут быть до контроля доступа - это `static` или атрибуты, такие как `@IBAction` и `@IBOutlet`:
+
+**Нежелательно:** 
+```swift
+lazy dynamic fileprivate var fluxCapacitor = FluxCapacitor()
+fileprivate static let viperModuleName = "Main"
+private @IBOutlet weak var submitButton: UIButton!
+```
+**Желательно:** 
+```swift
+fileprivate dynamic lazy var fluxCapacitor = FluxCapacitor()
+static fileprivate let viperModuleName = "Main"
+@IBOutlet private weak var submitButton: UIButton!
+
+```
+
 ## Именование переменных
 
 * Стараться не сокращать переменные, давать понятные имена, отражающие роль переменной в контексте. 
 * Не использовать венгерскую нотацию (например, `kCLLocationManagerFilterNone`), snake case (`like_so`), или macro case (`LIKE_THIS`).
+* Имена файлов должны в конце названия содержать тип. Не используйте аббревиатуры. Используйте PascalCase для имен файлов.
+*Структура папок файлов должна отражать структуру папок проекта Xcode. 
+XCode 9 сделает это за вас по умолчанию при добавлении новых файлов в проект.
+
 * Опускать ненужные слова:
 
 **Нежелательно:** 
@@ -124,6 +148,12 @@ print(myCar.carSpeed)
 ```swift
 print(myCart.weight)
 print(myCar.speed)
+
+class ConnectionTableViewCell: UITableViewCell {
+}
+
+protocol ModuleInput {
+}
 ```
 
 * Называйте функции с параметрами так, чтобы было понятно, что такое первый параметр.
@@ -304,6 +334,24 @@ let (something, somethingElse) = foo
 Создайте `typealiases`, чтобы придать семантический смысл часто используемым типы данных и замыканиям.
 Typealias эквивалентно `typedef`  в C и должны использоваться для создания имен для типов.
 
+
+```swift
+typealias IndexRange = Range<Int>
+
+typealias JSONObject = [String: AnyObject]
+
+typealias APICompletion = (jsonResult: [JSONObject]?, error: NSError?) -> Void
+
+typealias BasicBlock = () -> Void
+
+typealias AddressBlock = (Address? -> Void)
+
+func getLocationFromIp(completion: AddressBlock?) { ... }
+func getLocationFromCoreLocation(completion: AddressBlock?) { ... }
+func getLocationWithMagic(completion: AddressBlock?) { ... }
+
+```
+
 ## Организация кода
 
 ### Структура класса
@@ -364,7 +412,14 @@ extension MyClass: Equatable { ... }
 
 // MARK: - Private methods
 
-private extension MyClass { ... }
+private extension MyClass { 
+
+  // MARK: - Set default state
+
+  private func setNavigationBar() { ... }
+  private func setTableView() { ... }
+
+}
 ```
 
 * Старайтесь опираться на нее и разделять блоки кода с помощью `// MARK: -` для лучшей читабельности.
@@ -377,6 +432,41 @@ private extension MyClass { ... }
 В местах, где они нужны, комментарии должны объяснять, зачем некоторый код выполняет свою логику. Любые комментарии должны быть или релевантными и актуальными, или их не должно быть вовсе.
 
 Также не стоит забывать, что комментарии в виде `///` и `/** */` подхватываются IDE и впоследствие видны в панели справа.
+
+* Для сложных классов желательно, но не обязательно опишите использование класса с некоторыми потенциальными примерами. 
+
+**Желательно:** 
+```swift
+/**
+## Feature Support
+
+This class does some awesome things. It supports:
+
+- Feature 1
+- Feature 2
+- Feature 3
+
+## Examples
+
+Here is an example use case indented by four spaces because that indicates a
+code block:
+
+let myAwesomeThing = MyAwesomeClass()
+myAwesomeThing.makeMoney()
+
+## Warnings
+
+There are some things you should be careful of:
+
+1. Thing one
+2. Thing two
+3. Thing three
+*/
+
+class MyAwesomeClass {
+  /* ... */
+}
+```
 
 ### Вычислимые свойства
 
@@ -518,6 +608,22 @@ let latitude = me.homeTown?.location?.latitude
 if let town = me.homeTown, location = town.location {
     // access latitude, longitude
 }
+```
+* Если Вы не планируете на самом деле использовать значение, хранящееся в необязательном, но нужно определить, является ли это значение nil, 
+явно проверьте это значение на равенство с nil в отличие от использования синтаксиса if let.
+
+**Нежелательно:** 
+```swift
+if let _ = someOptional {
+  // do something
+}
+```
+**Желательно:** 
+```swift
+if someOptional != nil {
+  // do something
+}
+
 ```
 
 ### Структуры
@@ -671,25 +777,13 @@ if let me = a.myself,
     print("My dog is \(dogsAge) years old")
 }
 ```
-
-## Правила хорошего тона
-
-* Если большой кортеж или сигнатура функции начинают повторяться, что разумно выделить `typealias` и использовать его:
-
-**Нежелательно:** 
-```swift
-func getLocationFromIp(completion: (Address? -> Void)?) { ... }
-func getLocationFromCoreLocation(completion: (Address? -> Void)?) { ... }
-func getLocationWithMagic(completion: (Address? -> Void)?) { ... }
-```
+* Используйте одну строку для одиночного `return`.
 **Желательно:** 
 ```swift
-typealias AddressBlock = (Address? -> Void)
-
-func getLocationFromIp(completion: AddressBlock?) { ... }
-func getLocationFromCoreLocation(completion: AddressBlock?) { ... }
-func getLocationWithMagic(completion: AddressBlock?) { ... }
+guard let result = result else { return }
 ```
+
+## Правила хорошего тона
 
 * Если в проекте используется *SwiftGen*, то желательно создать скрипт в `Build Phases`, выполняющий пересоздание соответствующих файлов.
 
@@ -729,4 +823,47 @@ func do(x : UIImage) { ... }
 ```swift
 let a: Int = 4
 func do(x: UIImage) { ... }
+```
+
+* Следуйте рекомендуемому стилю отступа Xcode (т. е. ваш код не должен меняться, если нажата клавиша CTRL-I). 
+При объявлении функции, которая охватывает несколько строк, следует использовать синтаксис Xcode по умолчанию.
+* При вызове функции, имеющей множество параметров, поместите каждый аргумент в отдельную строку с одним дополнительным отступом
+
+**Желательно:** 
+```swift
+someFunctionWithManyArguments(
+  firstArgument: "Hello, I am a string",
+  secondArgument: myVariable,
+  thirdArgument: someOtherLocalProperty)
+```
+
+*  Должна быть ровно одна пустая строка между методами, чтобы помочь в визуальной ясности и организации. 
+Пробелы в методах должны разделять функциональность, но наличие слишком большого количества разделов в методе часто означает, 
+что вы должны рефакторинг в несколько методов.
+
+### defer
+
+* Если требуется несколько точек выхода, рассмотрите возможность использования блока defer, чтобы избежать дублирования кода. Можно использовать несколько блоков defer. Примечание: defer выполняются в обратном порядке их инициализации. 
+
+```swift
+
+func resizeImage(url: NSURL) -> UIImage? {
+  // ...
+  let dataSize: Int = ...
+  let destData = UnsafeMutablePointer<UInt8>.alloc(dataSize)
+  defer {
+    destData.dealloc(dataSize)
+    }
+
+  var destBuffer = vImage_Buffer(data: destData, ...)
+
+  // scale the image from sourceBuffer to destBuffer
+  var error = vImageScale_ARGB8888(&sourceBuffer, &destBuffer, ...)
+  guard error == kvImageNoError  else { return nil }
+
+  // create a CGImage from the destBuffer
+  guard let destCGImage = vImageCreateCGImageFromBuffer(&destBuffer, &format, ...) 
+  else { return nil }
+  // ...
+}
 ```
